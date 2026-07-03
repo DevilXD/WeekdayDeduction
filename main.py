@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-from time import time
+from time import time, sleep
 from collections import defaultdict
 
 from translate import TR
@@ -65,7 +65,7 @@ while True:
     ask_time: float = time()
     exp_answer: int = guess.answer()
     if USE_SPEECH:
-        guess.speak_answer()
+        guess.speak_guess()
     else:
         print(guess)
     print()
@@ -116,11 +116,13 @@ while True:
         repeat_flag = False
         repeat_dates[guess] += 5 if score < win_threshold else 1
         if LOSE_INSTANTLY:
-            answer_text: str = str(exp_answer)
-            if guess.type is GuessType.DAY_MONTH_ONLY:
-                answer_text = str(exp_answer if exp_answer < 4 else exp_answer - 7)
-            print(TR("lose").format(answer=answer_text))
-            break
+            print(TR("lose").format(answer=guess.answer_text()))
+            sleep(5)
+            last_guess = None
+            repeat_flag = False
+            good = fast = wrong = 0
+            good_sum = fast_sum = 0.0
+            repeat_dates.clear()
         else:
             print(
                 TR("wrong").format(

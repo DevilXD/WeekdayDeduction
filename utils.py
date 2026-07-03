@@ -107,7 +107,7 @@ def parse_weekday(text: str) -> int | None:
     """
     text = text.strip().lower()
     from translate import TR  # circular import
-    all_weekdays: dict[int, str] = TR("weekdays")
+    all_weekdays: dict[int, str] = cast("dict[int, str]", TR("weekdays"))
 
     # Numeric input support
     if text.isdigit():

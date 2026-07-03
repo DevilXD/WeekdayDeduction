@@ -117,7 +117,7 @@ class Translator:
                 raise ValueError("Translations cannot define 'language_name'")
         self._translation["language_name"] = language
 
-    def __call__(self, *path: str | int) -> Any:
+    def __call__(self, *path: str | int) -> str:
         if not path:
             raise ValueError("Language path expected")
         v: Any = self._translation

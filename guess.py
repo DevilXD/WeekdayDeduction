@@ -104,7 +104,19 @@ class Guess:
             a = (a - 1) % 7
         return a
 
-    def speak_answer(self) -> None:
+    def answer_text(self) -> str:
+        # Returns the expected answer as a string, formatted for display
+        ans = self.answer()
+        match self.type:
+            case GuessType.DAY_MONTH_ONLY:
+                return str(ans if ans < 4 else ans - 7)
+            case GuessType.FULL_DATE | GuessType.YEAR_ONLY:
+                from translate import TR  # circular import
+                return TR("weekdays", ans)
+            case _:
+                return str(ans)
+
+    def speak_guess(self) -> None:
         from translate import TR  # circular import
         TR.speak(str(self))
 
