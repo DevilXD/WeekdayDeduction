@@ -20,7 +20,7 @@ To compute the weekday of a particular date, you have to find a reference weekda
 
 ---
 
-# Glossary
+## Glossary
 
 - Leap year - A year that is either divisible by 400, or is divisible by 4 and isn't divisible by 100. For the practical range, this can be reduced to a simple "divisible by 4" rule.
 - Reference weekday/year/decade/century - The "doomsday weekday" associated with a given year, decade or century, usually represented as a precomputed pair of a year and its reference weekday in form of "YYYY-Weekday" for convenience.
