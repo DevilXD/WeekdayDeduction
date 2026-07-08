@@ -12,7 +12,7 @@ from utils import (  # noqa
     uinput,
     uinput2,
     wday_check,
-    shift_check,
+    offset_check,
     value_check,
     get_guess_type,
     random_from_dict,
@@ -82,7 +82,7 @@ while True:
                 value_check,
             )
         case GuessType.DAY_MONTH_ONLY:
-            usr_answer = uinput(TR("input", "shift").format(score=score_text), shift_check)
+            usr_answer = uinput(TR("input", "offset").format(score=score_text), offset_check)
         case _:
             # usr_answer = uinput(TR("input", "weekday").format(score=score_text), wday_check)
             usr_answer = uinput2(TR("input", "weekday").format(score=score_text))

@@ -150,7 +150,7 @@ def value_check(text: str) -> tuple[str, int] | None:
     return str(value), value
 
 
-def shift_check(text: str) -> tuple[str, int] | None:
+def offset_check(text: str) -> tuple[str, int] | None:
     """
     Int parser, but limits the valid value range to <-6, 6>.
     Returns None when the conversion fails, or the value is out of range.
@@ -158,10 +158,10 @@ def shift_check(text: str) -> tuple[str, int] | None:
     result = value_check(text)
     if result is None:
         return None
-    _, shift = result
-    if -6 < shift > 6:
+    _, offset = result
+    if -6 < offset > 6:
         return None
-    return str(shift), shift % 7
+    return str(offset), offset % 7
 
 
 def normalize_unicode(text: str) -> str:

@@ -168,7 +168,7 @@ Combining the three steps of figuring out the year's reference weekday, day-mont
 To deduce the reference weekday for any year, there're a few more rules to remember:
 
 - Years divisible by **400** (1600, 2000, 2400, etc.) have **Tuesday** as their reference weekday. You can consider those century anchors.
-- Within each 400 years period, for each following century (+100, +200 or +300 from the century anchor), the sequence of reference weekdays is: **Sunday, Friday, Wednesday** (-2 shift for each). This lets you deduce the reference weekday for a given century.
+- Within each 400 years period, for each following century (+100, +200 or +300 from the century anchor), the sequence of reference weekdays is: **Sunday, Friday, Wednesday** (-2 offset for each). This lets you deduce the reference weekday for a given century.
 - From here, you can apply the "odd + 11" method (see below) to obtain the reference weekday for the target year.
 
 The "Odd + 11" method:
@@ -215,9 +215,9 @@ You're asked for all day anchor offsets for a specific month. Input all of them 
 Example answer for January: `310172431`, which corresponds to 3rd, 10th, 17th, 24th and 31st of January as anchors.
 The initial `0` can be optionally omitted when inputting the answer for February, March and November.
 
-### DAY_MONTH_ONLY: Deduce the shift value for a specific month and day
+### DAY_MONTH_ONLY: Deduce the offset value for a specific month and day
 
-You're asked for the shift value for a specific month and day. This can only range between -6 and 6, other values are rejected. A special "(leap)" text may sometimes appear to aid you when applying the final exception.
+You're asked for the offset value for a specific month and day. This can only range between -6 and 6, other values are rejected. A special "(leap)" text may sometimes appear to aid you when applying the final exception.
 
 ### DAY_MONTH_REF: Deduce the closest reference day for a given month and day
 

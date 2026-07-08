@@ -90,8 +90,7 @@
     "lose": "Przegrałeś! Prawidłowa odpowiedź to: {answer}",
     "input": {
         "weekday": "Podaj dzień tygodnia ({score}): ",
-        "shift": "Podaj wartość przesunięcia ({score}): ",
-        "closest_ref": "Podaj najbliższy dzień odniesienia ({score}): ",
+        "offset": "Podaj wartość przesunięcia ({score}): ",
         "ref_sequence": "Podaj sekwencję dni odniesienia ({score}): "
     }
 }

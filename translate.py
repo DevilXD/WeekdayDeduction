@@ -54,8 +54,7 @@ default_translation: JsonType = {
     "lose": "You lose! The correct answer was: {answer}",
     "input": {
         "weekday": "Input weekday ({score}): ",
-        "shift": "Input the shift value ({score}): ",
-        "closest_ref": "Input the closest reference day ({score}): ",
+        "offset": "Input the offset value ({score}): ",
         "ref_sequence": "Input the reference days sequence ({score}): ",
     }
 }
