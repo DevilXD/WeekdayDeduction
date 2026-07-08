@@ -76,7 +76,7 @@ class Guess:
                     ''.join(
                         str(i * 7 + month_offset)
                         for i in range(5)
-                        if (i * 7 + month_offset) <= month_offset
+                        if (i * 7 + month_offset) <= MONTHS_DATA[self.month][0]
                     )
                 )
             case GuessType.DAY_MONTH_REF:
