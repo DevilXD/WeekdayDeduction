@@ -203,24 +203,33 @@ The Python script lets you test your deduction skills in the 5 categories/modes 
 ### FULL_DATE: Deduce the weekday for a specific date
 
 You're asked for the weekday of a specific date. Use the ZXCVBNM keys (mapped to the Monday-Sunday range) to answer.
+The years are limited to the practical range only.
+This allows you to practice deducing the weekday for a given date.
 
 ### YEAR_ONLY: Deduce the reference weekday for a specific year
 
 You're asked for the reference weekday for a specific year. Use the ZXCVBNM keys (mapped to the Monday-Sunday range) to answer.
-The current practice range is set to 1990-2010, but can be changed by modifying `MIN_YEAR` and `MAX_YEAR` values.
+The years are limited to the practical range only.
+This allows you to practice deducing the reference weekday for a given year.
 
 ### MONTH_ONLY: Deduce all day anchor offsets for a specific month
 
 You're asked for all day anchor offsets for a specific month. Input all of them without spaces to answer.
 Example answer for January: `310172431`, which corresponds to 3rd, 10th, 17th, 24th and 31st of January as anchors.
 The initial `0` can be optionally omitted when inputting the answer for February, March and November.
+This allows you to practice remembering anchor days within each month.
 
 ### DAY_MONTH_ONLY: Deduce the offset value for a specific month and day
 
 You're asked for the offset value for a specific month and day. This can only range between -6 and 6, other values are rejected. A special "(leap)" text may sometimes appear to aid you when applying the final exception.
+This allows you to practice deducing the offset value for a given month and day.
 
-### DAY_MONTH_REF: Deduce the closest reference day for a given month and day
+### OFFSET_WEEKDAY: Deduce the weekday for a given reference weekday and offset
 
-You're asked for the closest reference day of the month, for a specific month and day. For example, for 10th of September, the closest reference day is 12th of September.
-The closest reference day of the month is always up to 3 days apart from the given date, except for dates near the end of the month, where the last reference day is expected.
-For February, March and November, the "0th" day is also included as a valid option. Note that there's only one correct answer for a given date.
+You're asked for the weekday, given a reference weekday and an offset to it. For example, "+2  Saturday" results in "Monday" being the right answer.
+This allows you to practice the final step of combining the offset deduced from a day and month combination, and the reference weekday deduced from the year.
+
+### ODD_11: Deduce the offset value for a specific two-digit year ending
+
+You're asked for the offset value for a specific two-digit year ending, using the "Odd + 11" method: see "Extending the years range" section for more information.
+This allows you to practice the algorithm used in that method.

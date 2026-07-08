@@ -76,12 +76,7 @@ while True:
                 TR("input", "ref_sequence").format(score=score_text),
                 value_check,
             )
-        case GuessType.DAY_MONTH_REF:
-            usr_answer = uinput(
-                TR("input", "closest_ref").format(score=score_text),
-                value_check,
-            )
-        case GuessType.DAY_MONTH_ONLY:
+        case GuessType.DAY_MONTH_ONLY | GuessType.ODD_11:
             usr_answer = uinput(TR("input", "offset").format(score=score_text), offset_check)
         case _:
             # usr_answer = uinput(TR("input", "weekday").format(score=score_text), wday_check)

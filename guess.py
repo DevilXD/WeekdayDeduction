@@ -1,52 +1,70 @@
 import random
 from enum import Enum, auto
 
-from constants import MONTHS_DATA
+from constants import MONTHS_DATA, REF_WEEKDAY_YEARS
 
 
 class GuessType(Enum):
     FULL_DATE = auto()       # Guess the weekday for a specific date
     YEAR_ONLY = auto()       # Guess the reference weekday for a specific year
-    MONTH_ONLY = auto()      # Guess the day offsets for a specific month
-    DAY_MONTH_ONLY = auto()  # Guess the total offset for a specific month and day
-    DAY_MONTH_REF = auto()   # Guess the closest reference day for a given month and day
+    OFFSET_WEEKDAY = auto()  # Guess the weekday for a given offset and reference weekday
+    MONTH_ONLY = auto()      # Guess all day offsets for a specific month
+    DAY_MONTH_ONLY = auto()  # Guess the offset for a specific month and day
+    ODD_11 = auto()          # Guess the offset for a given double-digit year ending
 
 
 class Guess:
+    # 7th of March has zero offset for any given year, and isn't affected by leap years
+    DEFAULT_DAY: int = 7
+    DEFAULT_MONTH: int = 3
+
     def __init__(self, guess_type: GuessType):
         self.type = guess_type
-        self.day: int = 0
+        self.day: int = 0  # also used as offset for OFFSET_WEEKDAY
         self.month: int = 0
-        self.year: int = 0
+        self.year: int = 0  # also used as ref_weekday for OFFSET_WEEKDAY
 
-        if self.type in (GuessType.YEAR_ONLY, GuessType.FULL_DATE):
-            self.year = self._choose_year()
-        elif self.type == GuessType.DAY_MONTH_ONLY:
-            self.year = 0 if random.random() < 0.5 else 1
-        elif self.type == GuessType.DAY_MONTH_REF:
-            self.year = 1  # Prevents the "(leap)" text from appearing
-
-        if self.type == GuessType.MONTH_ONLY:
-            self.month = random.randint(1, 12)
-
-        if self.type in (GuessType.DAY_MONTH_ONLY, GuessType.DAY_MONTH_REF, GuessType.FULL_DATE):
-            self.day, self.month = self._choose_day_month()
+        match self.type:
+            case GuessType.FULL_DATE:
+                self.day, self.month = self._choose_day_month()
+                self.year = self._choose_year()
+            case GuessType.DAY_MONTH_ONLY:
+                self.day, self.month = self._choose_day_month()
+                # To make this work, the two years here have to have Monday as their
+                # reference weekday, one being leap and the other one being non-leap
+                self.year = 2016 if random.random() < 0.5 else 1994
+            case GuessType.YEAR_ONLY:
+                self.day = self.DEFAULT_DAY
+                self.month = self.DEFAULT_MONTH
+                self.year = self._choose_year()
+            case GuessType.OFFSET_WEEKDAY:
+                self.month = self.DEFAULT_MONTH
+                self.day = random.randint(self.DEFAULT_DAY - 3, self.DEFAULT_DAY + 3)
+                self.year = random.choice(list(REF_WEEKDAY_YEARS.values()))
+            case GuessType.MONTH_ONLY:
+                self.month = random.randint(1, 12)
+            case GuessType.ODD_11:
+                self.year = random.randint(0, 99)
 
     def __str__(self) -> str:
         from translate import TR  # circular import
         match self.type:
-            case GuessType.DAY_MONTH_ONLY | GuessType.DAY_MONTH_REF:
-                leap_text: str = ""
-                if self.year == 0 and (self.month <= 2 or random.random() < 0.4):
-                    leap_text = f" ({TR('leap')})"
-                return f"{self.day} {TR("months", self.month)}{leap_text}"
-            case GuessType.YEAR_ONLY:
+            case GuessType.YEAR_ONLY | GuessType.ODD_11:
                 return str(self.year)
             case GuessType.MONTH_ONLY:
                 return TR("months", self.month)
             case GuessType.FULL_DATE:
                 return f"{self.day} {TR("months", self.month)} {self.year}"
-        return ''  # failsafe
+            case GuessType.OFFSET_WEEKDAY:
+                offset: int = self.day - self.DEFAULT_DAY
+                ref_weekday: int = (self.answer() - offset) % 7
+                return f"{offset:+d}  {TR("weekdays", ref_weekday)}"
+            case GuessType.DAY_MONTH_ONLY:
+                leap_text: str = ""
+                if self.year == 0 and (self.month <= 2 or random.random() < 0.4):
+                    leap_text = f" ({TR('leap')})"
+                return f"{self.day} {TR("months", self.month)}{leap_text}"
+        raise RuntimeError(f"Unsupported guess type: {self.type}")
 
     def _repr_tuple(self) -> tuple[GuessType, int, int, int]:
         return (self.type, self.day, self.month, self.year)
@@ -68,8 +86,7 @@ class Guess:
         # usually a number representing a weekday or offset
         # For GuessType.MONTH_ONLY, the answer is the day offset for a given month
         # NOTE: Only supports years 1901-2099
-        if self.type is not GuessType.YEAR_ONLY:
-            month_offset: int = MONTHS_DATA[self.month][1]
+        month_offset: int = MONTHS_DATA[self.month][1]
         match self.type:
             case GuessType.MONTH_ONLY:
                 return int(
@@ -79,30 +96,25 @@ class Guess:
                         if (i * 7 + month_offset) <= MONTHS_DATA[self.month][0]
                     )
                 )
-            case GuessType.DAY_MONTH_REF:
-                mod_offset = month_offset % 7
-                if self.leap and self.month <= 2:
-                    mod_offset = (mod_offset + 1) % 7
-                test_days = [7 * i + mod_offset for i in range(5)]
-                for i, d in enumerate(test_days):
-                    if d == self.day:
-                        return self.day
-                    elif d > self.day:
-                        if i == 0:
-                            return d
-                        elif d > MONTHS_DATA[self.month][0]:
-                            return test_days[i-1]
-                        return d if d - self.day < self.day - test_days[i-1] else test_days[i-1]
-                return test_days[-1]
-            case GuessType.DAY_MONTH_ONLY:
-                a = (self.day - month_offset) % 7
-            case GuessType.YEAR_ONLY:
-                a = (self.year + (self.year // 4)) % 7
-            case GuessType.FULL_DATE:
+            case GuessType.ODD_11:
+                a = self.year
+                if a % 2 == 1:
+                    a += 11
+                a //= 2
+                if a % 2 == 1:
+                    a += 11
+                return 7 - (a % 7)
+            case (
+                GuessType.FULL_DATE |
+                GuessType.DAY_MONTH_ONLY |
+                GuessType.YEAR_ONLY |
+                GuessType.OFFSET_WEEKDAY
+            ):
                 a = (self.year + (self.year // 4) - month_offset + self.day) % 7
-        if self.leap and self.month <= 2 and self.month > 0:
-            a = (a - 1) % 7
-        return a
+                if self.leap and self.month <= 2 and self.month > 0:
+                    return (a - 1) % 7
+                return a
+        raise RuntimeError(f"Unsupported guess type: {self.type}")
 
     def answer_text(self) -> str:
         # Returns the expected answer as a string, formatted for display
@@ -110,11 +122,10 @@ class Guess:
         match self.type:
             case GuessType.DAY_MONTH_ONLY:
                 return str(ans if ans < 4 else ans - 7)
-            case GuessType.FULL_DATE | GuessType.YEAR_ONLY:
+            case GuessType.FULL_DATE | GuessType.YEAR_ONLY | GuessType.OFFSET_WEEKDAY:
                 from translate import TR  # circular import
                 return TR("weekdays", ans)
-            case _:
-                return str(ans)
+        return str(ans)
 
     def speak_guess(self) -> None:
         from translate import TR  # circular import
