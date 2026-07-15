@@ -7,7 +7,10 @@ from typing import Any
 from constants import LANG_PATH, LOCAL_LANG
 from utils import JsonType, json_save, json_load
 
-import yapper
+try:
+    import yapper
+except ImportError:
+    yapper = None
 
 
 default_translation: JsonType = {
@@ -82,11 +85,14 @@ class Translator:
             self.set_language(LOCAL_LANG)
 
         # Speaker init
-        speaker_key: dict[str, str] = self._translation["speaker"]
-        speaker_flavor: yapper.enums.PiperVoice = getattr(
-            getattr(yapper, f"PiperVoice{speaker_key['name']}"), speaker_key["flavor"]
-        )
-        self._speaker = yapper.PiperSpeaker(voice=speaker_flavor)
+        if yapper is not None:
+            speaker_key: dict[str, str] = self._translation["speaker"]
+            speaker_flavor: yapper.enums.PiperVoice = getattr(  # type: ignore[unused-ignore]
+                getattr(yapper, f"PiperVoice{speaker_key['name']}"), speaker_key["flavor"]
+            )
+            self._speaker = yapper.PiperSpeaker(voice=speaker_flavor)
+        else:
+            self._speaker = None
 
     @property
     def languages(self) -> abc.Iterable[str]:
@@ -97,6 +103,11 @@ class Translator:
         return self._translation["language_name"]
 
     def speak(self, text: str) -> None:
+        if self._speaker is None:
+            raise RuntimeError(
+                "yapper-tts is not installed; install with 'pip install yapper-tts' "
+                "(or requirements.txt) to use speech"
+            )
         self._speaker.say(text)
 
     def set_language(self, language: str):
