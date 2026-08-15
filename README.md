@@ -169,7 +169,7 @@ To deduce the reference weekday for any year, there're a few more rules to remem
 
 - Years divisible by **400** (1600, 2000, 2400, etc.) have **Tuesday** as their reference weekday. You can consider those century anchors.
 - Within each 400 years period, for each following century (+100, +200 or +300 from the century anchor), the sequence of reference weekdays is: **Sunday, Friday, Wednesday** (-2 offset for each). This lets you deduce the reference weekday for a given century.
-- From here, you can apply the "odd + 11" method (see below) to obtain the reference weekday for the target year.
+- From here, you can apply either the "Odd + 11" or "x10 + diff" methods (see below) to obtain the reference weekday for the target year.
 
 The "Odd + 11" method:
 
@@ -180,13 +180,28 @@ The "Odd + 11" method:
 5. Compute `7 - (n mod 7)` (where `n` is the current number). This is equivalent to computing `n mod 7` and simply flipping the sign of the result.
 6. The result is an offset from the century's reference weekday, that you can then use to obtain the reference weekday for the target year.
 
-Here are some examples:
+Here are some examples for this method:
 
 - 1673 -> 1600-Tuesday -> `(73 + 11) / 2 = 42` -> `42 mod 7 = 0` (no sign flip required) -> +0 offset from Tuesday -> Tuesday
 - 1764 -> 1700-Sunday -> `64 / 2 = 32` -> `32 mod 7 = 4` (-4/+3 after sign flip) -> +3 offset from Sunday -> Wednesday
 - 1847 -> 1800-Friday -> `(47 + 11) / 2 = 29` -> `(29 + 11) mod 7 = 5` (-5/+2 after sign flip) -> +2 offset from Friday -> Sunday
 - 1929 -> 1900-Wednesday -> `(29 + 11) / 2 = 20` -> `20 mod 7 = 6` (-6/+1 after sign flip) -> +1 offset from Wednesday -> Thursday
 - 2026 -> 2000-Tuesday -> `26 / 2 = 13` -> `(13 + 11) mod 7 = 3` (-3/+4 after sign flip) -> -3 offset from Tuesday -> Saturday
+
+The "x10 + diff" method ([source](https://www.reddit.com/r/math/comments/g0nnsf/tribute_to_conway_new_doomsday_rule_method/))
+
+1. Determine the closest leap year that's less than or equal to your target year (ex. for 2022, 2020 year is the closest, for 2024 it's just 2024).
+2. Using just the last two digits of both, the previous leap year and the target year, determine their difference (ex. 2022 - 2020 = 2; 2024 - 2024 = 0)
+3. Compute `(X * 10 + d) mod 7`, where `X` is the last two digits of the closest leap year modulo 7 (ex. 20 mod 7 = 6), and `d` is the difference calculated in the previous step.
+4. The result is an offset from the century's reference weekday, that you can then use to obtain the reference weekday for the target year.
+
+Here are some examples for this method:
+
+- 1673 -> 1600-Tuesday -> 1672 was closest leap (d=1) -> `72 mod 7 = 2` (X=2) -> `(2 * 10 + 1) mod 7 = 0` -> +0 offset from Tuesday -> Tuesday
+- 1764 -> 1700-Sunday -> 1764 was closest leap (d=0) -> `64 mod 7 = 1` (X=1) -> `(1 * 10 + 0) mod 7 = 3` -> +3 offset from Sunday -> Wednesday
+- 1847 -> 1800-Friday -> 1844 was closest leap (d=3) -> `44 mod 7 = 2` (X=2) -> `(2 * 10 + 3) mod 7 = 2` -> +2 offset from Friday -> Sunday
+- 1929 -> 1900-Wednesday -> 1928 was closest leap (d=1) -> `28 mod 7 = 0` (X=0) -> `0 * 10 + 1 = 1` -> +1 offset from Wednesday -> Thursday
+- 2026 -> 2000-Tuesday -> 2024 was closest leap (d=2) -> `24 mod 7 = 3` (X=3) -> `(3 * 10 + 2) mod 7 = 4` -> 4/-3 offset from Tuesday -> Saturday
 
 ---
 
