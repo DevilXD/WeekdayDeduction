@@ -4,6 +4,8 @@ import random
 from time import time, sleep
 from collections import defaultdict
 
+from typing import TypedDict
+
 from translate import TR
 from guess import Guess, GuessType
 from constants import MAX_ANSWER_TIME
@@ -24,11 +26,23 @@ from utils import (  # noqa
 # TR.set_language("English")  # use this to change language to any supported by the lang folder
 
 
-fast: int = 0
-good: int = 0
-wrong: int = 0
-good_sum: float = 0.0
-fast_sum: float = 0.0
+class StatsDict(TypedDict):
+    fast: int
+    good: int
+    wrong: int
+    perfect: int
+    good_sum: float
+    fast_sum: float
+
+
+stats: StatsDict = {
+    "fast": 0,
+    "good": 0,
+    "wrong": 0,
+    "perfect": 0,
+    "good_sum": 0.0,
+    "fast_sum": 0.0,
+}
 
 
 print()
@@ -37,19 +51,20 @@ last_guess: Guess | None = None
 repeat_dates: defaultdict[Guess, int] = defaultdict(int)
 while True:
     repeat_sum: int = sum(repeat_dates.values())
-    score: float = fast + good * SLOW_MULTI
-    win_threshold: float = check_win_threshold(100, wrong)
+    score: float = stats["fast"] + stats["good"] * SLOW_MULTI
+    win_threshold: float = check_win_threshold(100, stats["wrong"])
     progress: float = min(max(score / win_threshold, 0.0), 1.0)
     if score >= win_threshold and (repeat_sum <= 0 or score >= win_threshold * 2):
         print(
             TR("youve_won").format(
                 score=f"{score:.1f}/{win_threshold}",
-                good=good,
-                good_avg=good_sum/good,
-                fast=fast,
-                slow=good-fast,
-                fast_avg=fast_sum/fast,
-                wrong=wrong
+                good=stats["good"],
+                good_avg=stats["good_sum"]/stats["good"],
+                perfect=stats["perfect"],
+                fast=stats["fast"],
+                slow=stats["good"]-stats["fast"],
+                fast_avg=stats["fast_sum"]/stats["fast"],
+                wrong=stats["wrong"],
             )
         )
         break
@@ -85,12 +100,14 @@ while True:
     answer_time: float = min(time() - ask_time, MAX_ANSWER_TIME)
 
     if usr_answer == exp_answer:
-        good += 1
-        good_sum += answer_time
+        stats["good"] += 1
+        stats["good_sum"] += answer_time
         if answer_time < FAST_THRESHOLD:
-            fast += 1
-            fast_sum += answer_time
             repeat_flag = True
+            stats["fast"] += 1
+            stats["fast_sum"] += answer_time
+            if sum(repeat_dates.values()) <= 0:
+                stats["perfect"] += 1
         elif repeat_sum > 30:
             repeat_flag = True
         if (attempts := repeat_dates.get(guess)) is not None:
@@ -107,7 +124,7 @@ while True:
             )
         )
     else:
-        wrong += 1
+        stats["wrong"] += 1
         repeat_flag = False
         repeat_dates[guess] += 5 if score < win_threshold else 1
         if LOSE_INSTANTLY:
@@ -115,8 +132,8 @@ while True:
             sleep(5)
             last_guess = None
             repeat_flag = False
-            good = fast = wrong = 0
-            good_sum = fast_sum = 0.0
+            stats["good"] = stats["fast"] = stats["wrong"] = 0
+            stats["good_sum"] = stats["fast_sum"] = 0.0
             repeat_dates.clear()
         else:
             print(
