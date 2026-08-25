@@ -220,30 +220,23 @@ def check_win_threshold(
 
 
 def get_repeat_chance(
-    repeat_sum: int,       # amount of repeats remaining
-    progress: float,       # 0-1 progress of the round
-    x_limit: int = 20,     # for any k_factor, the chance for this limit maxes at y_limit percent
-    y_limit: float = 0.8,  # max chance
-    # k_factor scales linearly from x_limit to this value as the game progresses
-    final_k_factor: float = 5,
+    repeat_sum: int,        # amount of repeats remaining
+    progress: float,        # 0-1 progress of the round
+    x_limit: int = 20,      # the chance for this limit maxes at y_limit percent
+    y_one: float = 0.3,     # the pinned chance for the "1 / x_limit" case
+    y_limit: float = 0.8,   # max chance
 ) -> float:
+    assert x_limit > 0
+    assert repeat_sum >= 0
+    assert y_one + 0.01 < y_limit <= 1.0
     assert 0.0 <= progress <= 1.0
-    assert final_k_factor > 0
-    # k_factor resulting chances breakdown (ends with x_limit ~= y_limit):
-    # k=4:  1 ~=  17.8% , 2 ~= *31.7%*, 3 ~= *42.5%*, 5 ~=  57.5% , 10 ~=  73.9% , 15 ~= 78.6%
-    # k=5:  1 ~= *14.8%*, 2 ~=  26.9% , 3 ~=  36.8% , 5 ~= *51.5%*, 10 ~= *70.5%*, 15 ~= 77.4%
-    # k=6:  1 ~=  12.7% , 2 ~= *23.5%*, 3 ~= *32.6%*, 5 ~=  46.9% , 10 ~=  67.3% , 15 ~= 76.1%
-    # k=8:  1 ~= *10.2%*, 2 ~=  19.3% , 3 ~=  27.3% , 5 ~= *40.5%*, 10 ~=  62.2% , 15 ~= 73.8%
-    # k=9:  1 ~=   9.4% , 2 ~=  17.9% , 3 ~= *25.4%*, 5 ~=  38.2% , 10 ~= *60.2%*, 15 ~= 72.8%
-    # k=11: 1 ~=   8.3% , 2 ~= *15.9%*, 3 ~=  22.8% , 5 ~=  34.9% , 10 ~=  57.0% , 15 ~= 71.1%
-    # k=14: 1 ~=   7.3% , 2 ~=  14.0% , 3 ~= *20.3%*, 5 ~= *31.6%*, 10 ~=  53.7% , 15 ~= 69.2%
-    # k=19: 1 ~=   6.3% , 2 ~=  12.3% , 3 ~=  17.9% , 5 ~=  28.4% , 10 ~= *50.3%*, 15 ~= 67.1%
-    # lin:  1 ~=   4.0% , 2 ~=   8.0%,  3 ~=  12.0% , 5 ~=  20.0% , 10 ~=  40.0% , 15 ~= 60.0%
-    k_factor: float = -(x_limit - final_k_factor) * progress + x_limit
-    return min(
-        y_limit * (1 - math.exp(-repeat_sum / k_factor)) / (1 - math.exp(-x_limit / k_factor)),
-        y_limit,  # clamp when wrong > x_limit
-    )
+    if progress >= 1.0:
+        # for a finished game, the repeat chance is max if there are repeat cases left,
+        # otherwise its zero
+        return 0.0 if repeat_sum <= 0 else y_limit
+    exponent: float = math.log((y_one / y_limit) * (1 - progress)) / math.log(1 / x_limit)
+    curve: float = min(repeat_sum / x_limit, 1) ** exponent
+    return min(y_limit, y_limit * (curve / (1 - progress)))
 
 
 # This below is to support saving/loading integer keys in dictionaries via JSON
