@@ -38,7 +38,9 @@ def uinput(prompt: str, convert: abc.Callable[[str], tuple[str, int] | None]) ->
         keys: list[str] = []
         while True:
             key: str = msvcrt.getwch()
-            if key == '\b':  # Backspace
+            if key == '\x03':  # Ctrl+C
+                raise KeyboardInterrupt
+            elif key == '\b':  # Backspace
                 if keys:
                     keys.pop()
                     print('\b \b', end='')
@@ -81,7 +83,9 @@ def uinput2(prompt: str) -> int:
         wday: int | None = None
         while True:
             key: str = msvcrt.getwch()
-            if key == 'z':
+            if key == '\x03':  # Ctrl+C
+                raise KeyboardInterrupt
+            elif key == 'z':
                 wday = 0
             elif key == 'x':
                 wday = 1

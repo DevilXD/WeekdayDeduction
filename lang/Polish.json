@@ -86,8 +86,10 @@
     "leap": "przestępny",
     "good": "Dobrze! ({repeat} powtórek) ({sign}{time:.2f}s)",
     "wrong": "Źle! ({repeat} powtórek) ({sign}{time:.2f}s)",
-    "youve_won": "Wygrałeś! Wynik: {score} ({perfect} perfekcyjnych, {good} poprawnych ({good_avg:.3f}s średnio), {fast}/{slow} szybkich/wolnych ({fast_avg:.3f}s średnio), {wrong} błędów)",
-    "lose": "Przegrałeś! Prawidłowa odpowiedź to: {answer}",
+    "win": "Wygrałeś!",
+    "lose": "Przegrałeś! Prawidłowa odpowiedź to: {answer}.",
+    "interrupt": "Przerwano.",
+    "scores": "{message} Wynik: {score} ({perfect} perfekcyjnych, {good} poprawnych ({good_avg:.3f}s średnio), {fast}/{slow} szybkich/wolnych ({fast_avg:.3f}s średnio), {wrong} błędów)",
     "input": {
         "weekday": "Podaj dzień tygodnia ({score}): ",
         "offset": "Podaj wartość przesunięcia ({score}): ",
