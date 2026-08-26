@@ -141,16 +141,17 @@ while True:
                 )
         print()
 
+    print()
     print(
         TR("scores").format(
             message=message,
             score=f"{score:.1f}/{win_threshold}",
             good=stats["good"],
-            good_avg=stats["good_sum"]/stats["good"],
+            good_avg=stats["good_sum"]/max(stats["good"], 1),
             perfect=stats["perfect"],
             fast=stats["fast"],
             slow=stats["good"]-stats["fast"],
-            fast_avg=stats["fast_sum"]/stats["fast"],
+            fast_avg=stats["fast_sum"]/max(stats["fast"], 1),
             wrong=stats["wrong"],
         )
     )
