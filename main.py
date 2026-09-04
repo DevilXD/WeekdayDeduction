@@ -162,7 +162,7 @@ while True:
     sleep(5)
     last_guess = None
     repeat_flag = False
-    stats["good"] = stats["fast"] = stats["wrong"] = 0
+    stats["perfect"] = stats["good"] = stats["fast"] = stats["wrong"] = 0
     stats["good_sum"] = stats["fast_sum"] = 0.0
     repeat_dates.clear()
 
