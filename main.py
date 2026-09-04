@@ -155,6 +155,7 @@ while True:
             wrong=stats["wrong"],
         )
     )
+    print()
     if not restart:
         break
 
